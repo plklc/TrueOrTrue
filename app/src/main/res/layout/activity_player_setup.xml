@@ -28,18 +28,24 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/titleText" />
 
-    <LinearLayout
-        android:id="@+id/playersContainer"
+    <ScrollView
+        android:id="@+id/playersScrollView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="16dp"
-        android:orientation="vertical"
+        android:layout_marginBottom="16dp"
         app:layout_constraintBottom_toTopOf="@id/addPlayerBtn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/playersTitle">
 
-    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/playersContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" />
+
+    </ScrollView>
 
     <Button
         android:id="@+id/addPlayerBtn"
