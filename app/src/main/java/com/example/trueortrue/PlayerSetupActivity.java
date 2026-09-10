@@ -2,17 +2,23 @@ package com.example.trueortrue;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class PlayerSetupActivity extends AppCompatActivity {
 
-    private LinearLayout playersContainer;
     private static final int MIN_PLAYERS = 2;
     private static final int MAX_PLAYERS = 16;
+    private final List<Player> players = new ArrayList<>();
+    private LinearLayout playersContainer;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,7 +42,7 @@ public class PlayerSetupActivity extends AppCompatActivity {
         заблокировать возможность удалить 2 изнчальных игроков
         */
 
-        if (playersContainer.getChildCount() >= MAX_PLAYERS) {
+        if (players.size() >= MAX_PLAYERS) {
             return;
         }
 
@@ -44,6 +50,24 @@ public class PlayerSetupActivity extends AppCompatActivity {
 
         EditText playerName = new EditText(this);
         playerName.setHint("Имя игрока");
+        Player player = new Player("");
+        players.add(player);
+
+        playerName.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                player.setName(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
 
         Button removeBtn = new Button(this);
         removeBtn.setText("✕");
@@ -60,18 +84,22 @@ public class PlayerSetupActivity extends AppCompatActivity {
         playerRow.addView(playerName, nameParams);
         playerRow.addView(removeBtn, btnParams);
 
-        removeBtn.setOnClickListener(v -> playersContainer.removeView(playerRow));
+        removeBtn.setOnClickListener(v -> {
+            playersContainer.removeView(playerRow);
+            players.remove(player);
+        });
 
         playersContainer.addView(playerRow);
     }
 
     private void startGame() {
 
-        if (playersContainer.getChildCount() < MIN_PLAYERS) {
+        if (players.size() < MIN_PLAYERS) {
             return;
         }
 
         Intent intent = new Intent(PlayerSetupActivity.this, GameActivity.class);
+        intent.putParcelableArrayListExtra("players", new ArrayList<>(players));
         startActivity(intent);
     }
 }
