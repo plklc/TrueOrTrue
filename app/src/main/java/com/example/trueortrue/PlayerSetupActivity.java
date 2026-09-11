@@ -19,6 +19,7 @@ public class PlayerSetupActivity extends AppCompatActivity {
     private static final int MAX_PLAYERS = 16;
 
     private final List<Player> players = new ArrayList<>();
+    private final List<EditText> playerNameInputs = new ArrayList<>();
 
     private LinearLayout playersContainer;
 
@@ -57,6 +58,8 @@ public class PlayerSetupActivity extends AppCompatActivity {
 
         EditText playerName = createPlayerNameInput(player);
         Button removeButton = createRemoveButton(player, playerRow);
+
+        playerNameInputs.add(playerName);
 
         LinearLayout.LayoutParams nameParams = new LinearLayout.LayoutParams(
                 0,
@@ -107,14 +110,46 @@ public class PlayerSetupActivity extends AppCompatActivity {
     }
 
     private void removePlayer(Player player, LinearLayout playerRow) {
+        int playerIndex = players.indexOf(player);
+
         players.remove(player);
+        playerNameInputs.remove(playerIndex);
         playersContainer.removeView(playerRow);
+    }
+
+    private boolean arePlayerNamesValid() {
+        boolean isValid = true;
+
+        for (int i = 0; i < players.size(); i++) {
+            Player player = players.get(i);
+            EditText playerNameInput = playerNameInputs.get(i);
+
+            if (player.getName().trim().isEmpty()) {
+                isValid = false;
+            } else {
+                playerNameInput.setError(null);
+            }
+        }
+
+        return isValid;
+    }
+
+    private void normalizePlayerNames() {
+        for (Player player : players) {
+            player.normalizeName();
+        }
     }
 
     private void startGame() {
         if (players.size() < MIN_PLAYERS) {
             return;
         }
+
+        if (!arePlayerNamesValid()) {
+            return;
+        }
+
+        normalizePlayerNames();
 
         Intent intent = new Intent(PlayerSetupActivity.this, GameActivity.class);
         intent.putParcelableArrayListExtra("players", new ArrayList<>(players));

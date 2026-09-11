@@ -23,6 +23,10 @@ public class Player implements Parcelable {
         this.name = name;
     }
 
+    public void normalizeName() {
+        name = name.trim();
+    }
+
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(name);
