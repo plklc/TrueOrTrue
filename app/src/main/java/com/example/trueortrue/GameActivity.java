@@ -8,71 +8,54 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class GameActivity extends AppCompatActivity {
 
-    private ArrayList<Player> players;
-    private int currentPlayerIndex = 0;
-    private List<Question> questions;
-    private final List<Question> usedQuestions = new ArrayList<>();
-    private final Random random = new Random();
+    private Game game;
+    private TextView currentPlayerName;
+    private TextView questionText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
-        players = getIntent().getParcelableArrayListExtra("players");
+        ArrayList<Player> players = getIntent().getParcelableArrayListExtra("players");
 
-        TextView currentPlayerName = findViewById(R.id.currentPlayerName);
+        currentPlayerName = findViewById(R.id.currentPlayerName);
+        questionText = findViewById(R.id.questionText);
+
         Button nextPlayerButton = findViewById(R.id.nextPlayerButton);
         Button nextQuestionButton = findViewById(R.id.nextQuestionButton);
-        TextView questionText = findViewById(R.id.questionText);
 
         QuestionRepository questionRepository = new QuestionRepository(this);
 
-        questions = questionRepository.getQuestions();
+        List<Question> questions = questionRepository.getQuestions();
 
-        if (players != null && !players.isEmpty()) {
-            currentPlayerName.setText(players.get(currentPlayerIndex).getName());
-        }
+        game = new Game(players, questions);
 
-        showRandomQuestion(questionText);
+        updatePlayer();
+        showNewQuestion();
 
         nextPlayerButton.setOnClickListener(v -> {
-            currentPlayerIndex++;
+            game.nextPlayer();
 
-            if (currentPlayerIndex >= players.size()) {
-                currentPlayerIndex = 0;
-            }
-
-            currentPlayerName.setText(players.get(currentPlayerIndex).getName());
-
-            showRandomQuestion(questionText);
+            updatePlayer();
+            showNewQuestion();
         });
 
-        nextQuestionButton.setOnClickListener(v -> showRandomQuestion(questionText));
+        nextQuestionButton.setOnClickListener(v -> showNewQuestion());
     }
 
-    private void showRandomQuestion(TextView questionText) {
+    private void updatePlayer() {
+        currentPlayerName.setText(game.getCurrentPlayer().getName());
+    }
 
-        if (questions.isEmpty()) {
-            return;
+    private void showNewQuestion() {
+        Question question = game.getRandomQuestion();
+
+        if (question != null) {
+            questionText.setText(question.getText());
         }
-
-        if (usedQuestions.size() >= questions.size()) {
-            usedQuestions.clear();
-        }
-
-        List<Question> availableQuestions = new ArrayList<>(questions);
-        availableQuestions.removeAll(usedQuestions);
-
-        int randomIndex = random.nextInt(availableQuestions.size());
-        Question question = availableQuestions.get(randomIndex);
-
-        usedQuestions.add(question);
-
-        questionText.setText(question.getText());
     }
 }

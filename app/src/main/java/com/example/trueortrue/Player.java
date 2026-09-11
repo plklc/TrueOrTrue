@@ -33,7 +33,7 @@ public class Player implements Parcelable {
         return 0;
     }
 
-    public static final Creator<Player> CREATOR = new Parcelable.Creator<Player>() {
+    public static final Creator<Player> CREATOR = new Parcelable.Creator<>() {
 
         @Override
         public Player createFromParcel(Parcel in) {

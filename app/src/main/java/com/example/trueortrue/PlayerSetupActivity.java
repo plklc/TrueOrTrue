@@ -17,42 +17,68 @@ public class PlayerSetupActivity extends AppCompatActivity {
 
     private static final int MIN_PLAYERS = 2;
     private static final int MAX_PLAYERS = 16;
+
     private final List<Player> players = new ArrayList<>();
+
     private LinearLayout playersContainer;
 
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player_setup);
 
-        Button startGameBtn = findViewById(R.id.startGameBtn);
-        Button addPlayerButton = findViewById(R.id.addPlayerBtn);
+        Button startGameButton = findViewById(R.id.startGameButton);
+        Button addPlayerButton = findViewById(R.id.addPlayerButton);
+
         playersContainer = findViewById(R.id.playersContainer);
 
         addPlayer();
         addPlayer();
 
         addPlayerButton.setOnClickListener(v -> addPlayer());
-        startGameBtn.setOnClickListener(v -> startGame());
+        startGameButton.setOnClickListener(v -> startGame());
     }
 
     private void addPlayer() {
-        //todo
-        /*
-        вынести в отдельный метод удаление игроков
-        заблокировать возможность удалить 2 изнчальных игроков
-        */
-
         if (players.size() >= MAX_PLAYERS) {
             return;
         }
 
-        LinearLayout playerRow = new LinearLayout(this);
-
-        EditText playerName = new EditText(this);
-        playerName.setHint("Имя игрока");
         Player player = new Player("");
         players.add(player);
 
+        LinearLayout playerRow = createPlayerRow(player);
+
+        playersContainer.addView(playerRow);
+    }
+
+    private LinearLayout createPlayerRow(Player player) {
+        LinearLayout playerRow = new LinearLayout(this);
+
+        EditText playerName = createPlayerNameInput(player);
+        Button removeButton = createRemoveButton(player, playerRow);
+
+        LinearLayout.LayoutParams nameParams = new LinearLayout.LayoutParams(
+                0,
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                1
+                );
+
+        LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+                );
+
+        playerRow.addView(playerName, nameParams);
+        playerRow.addView(removeButton, buttonParams);
+
+        return playerRow;
+    }
+
+    private EditText createPlayerNameInput(Player player) {
+        EditText playerName = new EditText(this);
+
+        playerName.setHint("Имя игрока");
         playerName.addTextChangedListener(new TextWatcher() {
 
             @Override
@@ -69,31 +95,23 @@ public class PlayerSetupActivity extends AppCompatActivity {
             }
         });
 
-        Button removeBtn = new Button(this);
-        removeBtn.setText("✕");
+        return playerName;
+    }
 
-        LinearLayout.LayoutParams nameParams =
-                new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1);
+    private Button createRemoveButton(Player player, LinearLayout playerRow) {
+        Button removeButton = new Button(this);
+        removeButton.setText("✕");
+        removeButton.setOnClickListener(v -> removePlayer(player, playerRow));
 
-        LinearLayout.LayoutParams btnParams =
-                new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.WRAP_CONTENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT
-                );
+        return removeButton;
+    }
 
-        playerRow.addView(playerName, nameParams);
-        playerRow.addView(removeBtn, btnParams);
-
-        removeBtn.setOnClickListener(v -> {
-            playersContainer.removeView(playerRow);
-            players.remove(player);
-        });
-
-        playersContainer.addView(playerRow);
+    private void removePlayer(Player player, LinearLayout playerRow) {
+        players.remove(player);
+        playersContainer.removeView(playerRow);
     }
 
     private void startGame() {
-
         if (players.size() < MIN_PLAYERS) {
             return;
         }

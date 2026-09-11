@@ -23,11 +23,9 @@ public class QuestionRepository {
         List<Question> questions = new ArrayList<>();
 
         try {
-            InputStream inputStream =
-                    context.getResources().openRawResource(R.raw.questions);
+            InputStream inputStream = context.getResources().openRawResource(R.raw.questions);
 
-            BufferedReader reader =
-                    new BufferedReader(new InputStreamReader(inputStream));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
 
             StringBuilder json = new StringBuilder();
 
@@ -45,7 +43,6 @@ public class QuestionRepository {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
 
                 String text = jsonObject.getString("text");
-
                 questions.add(new Question(text));
             }
 
